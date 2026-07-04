@@ -1,4 +1,6 @@
 package com.brianlimjj.thehundredgame.game.dto;
 
-public record GuessRequest(String playerId, int guess) {
+import java.util.List;
+
+public record GuessRequest(String playerId, List<Integer> guess) {
 }

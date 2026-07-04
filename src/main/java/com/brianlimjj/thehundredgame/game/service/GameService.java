@@ -6,27 +6,27 @@ import com.brianlimjj.thehundredgame.game.dto.JoinGameRequest;
 import com.brianlimjj.thehundredgame.game.model.Game;
 import com.brianlimjj.thehundredgame.game.model.GameStatus;
 import com.brianlimjj.thehundredgame.game.model.Player;
+import com.brianlimjj.thehundredgame.game.model.RoundResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-
-
 
 @Slf4j
 @Service
 public class GameService {
     private final Map<String, Game> games = new ConcurrentHashMap<>();
-    private final Random random = new Random();
+    private final Random random = new Random(); // maybe for future rules, can be removed
 
     public Game createGame() {
         String code = generateCode();
-        int target = random.nextInt(3) + 1;
-        Game game = new Game(code, target);
+        Game game = new Game(code);
         games.put(code, game);
-        log.info("Created game with code={} and targetNumber={}", code, target);
+        log.info("Created game with code={}", code);
         return game;
     }
 
@@ -36,11 +36,10 @@ public class GameService {
             throw new IllegalStateException("Game is full");
         }
         game.getPlayers().add(new Player(req.playerId(), req.name()));
-        if (game.getPlayers().size() == 2){
+        if (game.getPlayers().size() == 2) {
             game.setStatus(GameStatus.IN_PROGRESS);
         }
         return game;
-
     }
 
     public GameStateResponse makeGuess(String code, GuessRequest req) {
@@ -48,16 +47,80 @@ public class GameService {
         if (game.getStatus() != GameStatus.IN_PROGRESS) {
             throw new IllegalStateException("Game not in progress");
         }
-        if (req.guess() == game.getTargetNumber()) {
-            game.setStatus(GameStatus.FINISHED);
-            game.setWinnerId(req.playerId());
+
+        // store/update this player's guess for the current round
+        game.getCurrentGuesses().put(req.playerId(), req.guess());
+        log.info("Game {} round {}: player {} guessed {}",
+                code, game.getRound(), req.playerId(), req.guess());
+
+        boolean bothGuessed = game.getCurrentGuesses().size() == 2;
+        String winnerId = null;
+
+        if (bothGuessed) {
+            var players = game.getPlayers();
+            if (players.size() != 2) {
+                throw new IllegalStateException("Game must have exactly 2 players in progress");
+            }
+            String p1Id = players.get(0).getId();
+            String p2Id = players.get(1).getId();
+
+            List<Integer> g1 = game.getCurrentGuesses().get(p1Id);
+            List<Integer> g2 = game.getCurrentGuesses().get(p2Id);
+
+            int p1Points = 0;
+            int p2Points = 0;
+
+            for (int i = 1; i < g1.size(); i++) {
+                if  (g1.get(i) > g2.get(i)) {
+                    p1Points++;
+                } else if (g2.get(i) > g1.get(i)) {
+                    p2Points++;
+                }
+            }
+
+
+
+            if (p1Points > p2Points) {
+                winnerId = p1Id;
+            } else if (p2Points > p1Points) {
+                winnerId = p2Id;
+            }
+
+            game.getHistory().add(new RoundResult(
+                    game.getRound(), p1Id, g1, p2Id, g2, winnerId
+            ));
+
+            if (Objects.equals(winnerId, p1Id)) {
+                game.setStatus(GameStatus.FINISHED);
+                log.info("Game {} finished in round {} with guess {}", code, game.getRound(), g1);
+            } else {
+                game.nextRound();
+                log.info("Game {} moving to round {}", code, game.getRound());
+                bothGuessed = false;      // for the new round
+            }
         }
-        return new GameStateResponse(game.getCode(), game.getStatus(), game.getWinnerId());
+
+        return new GameStateResponse(
+                game.getCode(),
+                game.getStatus(),
+                game.getRound(),
+                bothGuessed,
+                winnerId
+
+        );
     }
 
     public GameStateResponse getState(String code) {
         Game game = getGameOrThrow(code);
-        return new GameStateResponse(game.getCode(), game.getStatus(), game.getWinnerId());
+        boolean bothGuessed = game.getCurrentGuesses().size() == 2;
+        // we don't expose history here for now
+        return new GameStateResponse(
+                game.getCode(),
+                game.getStatus(),
+                game.getRound(),
+                bothGuessed,
+                null
+        );
     }
 
     private Game getGameOrThrow(String code) {
@@ -69,7 +132,6 @@ public class GameService {
     }
 
     private String generateCode() {
-        // simple 6‑char code, improve later
         String letters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 6; i++) {
@@ -78,5 +140,3 @@ public class GameService {
         return sb.toString();
     }
 }
-
-
