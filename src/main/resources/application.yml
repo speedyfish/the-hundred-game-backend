@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: thehundredgame
+
+logging:
+  level:
+    root: INFO
+    com.brianlimjj.thehundredgame: DEBUG
+    org.springframework: INFO
+
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n"
