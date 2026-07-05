@@ -14,24 +14,18 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class GameWebSocketController {
 
-    private final GameService gameService;
+  private final GameService gameService;
 
-    @MessageMapping("/games/{code}/join")
-    @SendTo("/topic/games/{code}")
-    public GameStateResponse joinGame(
-            @DestinationVariable String code,
-            JoinGameRequest request
-    ) {
-        gameService.joinGame(code, request);
-        return gameService.getState(code);
-    }
+  @MessageMapping("/games/{code}/join")
+  @SendTo("/topic/games/{code}")
+  public GameStateResponse joinGame(@DestinationVariable String code, JoinGameRequest request) {
+    gameService.joinGame(code, request);
+    return gameService.getState(code);
+  }
 
-    @MessageMapping("/games/{code}/guess")
-    @SendTo("/topic/games/{code}")
-    public GameStateResponse makeGuess(
-            @DestinationVariable String code,
-            GuessRequest request
-    ) {
-        return gameService.makeGuess(code, request);
-    }
+  @MessageMapping("/games/{code}/guess")
+  @SendTo("/topic/games/{code}")
+  public GameStateResponse makeGuess(@DestinationVariable String code, GuessRequest request) {
+    return gameService.makeGuess(code, request);
+  }
 }
