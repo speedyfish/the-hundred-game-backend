@@ -10,9 +10,19 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+  private final WebSocketProps webSocketProps;
+
+  public WebSocketConfig(WebSocketProps webSocketProps) {
+    this.webSocketProps = webSocketProps;
+  }
+
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
-    registry.addEndpoint("/ws").setAllowedOriginPatterns("http://localhost:3000").withSockJS();
+    registry
+            .addEndpoint("/ws")
+            .setAllowedOriginPatterns(
+                    webSocketProps.getAllowedOrigins().toArray(String[]::new))
+            .withSockJS();
   }
 
   @Override

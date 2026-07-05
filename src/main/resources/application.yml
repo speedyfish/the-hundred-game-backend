@@ -1,6 +1,26 @@
 spring:
   application:
     name: thehundredgame
+  web:
+    cors:
+      allowed-origins:
+        - "http://localhost:3000"
+        - "https://the-hundred-game-frontend-hw87hnpya-speedyfishs-projects.vercel.app"
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+        - OPTIONS
+      allowed-headers:
+        - "*"
+      allow-credentials: true
+
+app:
+  ws:
+    allowed-origins:
+      - "http://localhost:3000"
+      - "https://the-hundred-game-frontend-hw87hnpya-speedyfishs-projects.vercel.app"
 
 logging:
   level:
