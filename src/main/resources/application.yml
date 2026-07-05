@@ -5,7 +5,7 @@ spring:
     cors:
       allowed-origins:
         - "http://localhost:3000"
-        - "https://the-hundred-game-frontend-hw87hnpya-speedyfishs-projects.vercel.app"
+        - "https://the-hundred-game-frontend-i2hl7g8dp-speedyfishs-projects.vercel.app"
       allowed-methods:
         - GET
         - POST
@@ -20,7 +20,7 @@ app:
   ws:
     allowed-origins:
       - "http://localhost:3000"
-      - "https://the-hundred-game-frontend-hw87hnpya-speedyfishs-projects.vercel.app"
+      - "https://the-hundred-game-frontend-i2hl7g8dp-speedyfishs-projects.vercel.app"
 
 logging:
   level:
