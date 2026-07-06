@@ -7,9 +7,7 @@ import com.brianlimjj.thehundredgame.game.dto.JoinGameRequest;
 import com.brianlimjj.thehundredgame.game.model.Game;
 import com.brianlimjj.thehundredgame.game.service.GameService;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/games")
 public class GameRestController {

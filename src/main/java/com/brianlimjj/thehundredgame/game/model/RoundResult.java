@@ -8,5 +8,4 @@ public record RoundResult(
     List<Integer> player1Guess,
     String player2Id,
     List<Integer> player2Guess,
-    String roundWinnerId) {
-}
+    String roundWinnerId) {}

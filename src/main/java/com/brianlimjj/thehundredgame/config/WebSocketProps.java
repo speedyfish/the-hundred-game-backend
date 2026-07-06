@@ -1,7 +1,6 @@
-package com.brianlimjj.thehundredgame.game.config;
+package com.brianlimjj.thehundredgame.config;
 
 import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -13,6 +12,5 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "app.ws")
 public class WebSocketProps {
 
-    private List<String> allowedOrigins = List.of();
-
+  private List<String> allowedOrigins = List.of();
 }

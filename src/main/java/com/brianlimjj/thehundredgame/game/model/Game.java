@@ -23,8 +23,7 @@ public class Game {
   // optional: remember previous rounds
   private final List<RoundResult> history = new ArrayList<>();
 
-  @Setter
-  private String winnerId;
+  @Setter private String winnerId;
 
   public Game(String code) {
     this.code = code;
