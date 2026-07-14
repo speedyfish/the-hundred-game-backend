@@ -73,13 +73,16 @@ public class GameService {
       int p1Points = 0;
       int p2Points = 0;
 
-      for (int i = 1; i < g1.size(); i++) {
+      for (int i = 0; i < g1.size(); i++) {
         if (g1.get(i) > g2.get(i)) {
           p1Points++;
         } else if (g2.get(i) > g1.get(i)) {
           p2Points++;
         }
       }
+
+      log.info("p1points: {}", p1Points);
+      log.info("p2points: {}", p2Points);
 
       if (p1Points > p2Points) {
         winnerId = p1Id;
@@ -98,7 +101,7 @@ public class GameService {
     }
 
     return new GameStateResponse(
-        game.getCode(), game.getStatus(), game.getRound(), bothGuessed, winnerId);
+        game.getCode(), game.getStatus(), game.getRound(), bothGuessed, winnerId, game.getCurrentGuesses(), game.getHistory());
   }
 
   /** Returns true if match is now finished. */
@@ -138,7 +141,7 @@ public class GameService {
     boolean bothGuessed = game.getCurrentGuesses().size() == 2;
     // we don't expose history here for now
     return new GameStateResponse(
-        game.getCode(), game.getStatus(), game.getRound(), bothGuessed, null);
+        game.getCode(), game.getStatus(), game.getRound(), bothGuessed, null,  game.getCurrentGuesses(), game.getHistory());
   }
 
   private Game getGameOrThrow(String code) {
